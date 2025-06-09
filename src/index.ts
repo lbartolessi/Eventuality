@@ -4,4 +4,4 @@ export type { EventHandler } from './EventHandler.js';
 export type { RequestEvent } from './RequestEvent.js';
 export type { EventualityOptions } from './EventualityOptions.js';
 export { Eventuality } from './Eventuality.js';
-export { eventMethod } from './decorators.js';
+export { eventHandler } from './decorators.js';
