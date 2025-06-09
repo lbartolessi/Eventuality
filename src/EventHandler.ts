@@ -1,4 +1,3 @@
-import { BaseEvent } from './BaseEvent.js';
 
 /**
  * Event handler interface for Eventuality.
@@ -6,10 +5,10 @@ import { BaseEvent } from './BaseEvent.js';
  */
 export interface EventHandler<T> {
   /**
-   * Handles an event.
-   * @param event The event to handle.
+   * Handles an event payload.
+   * @param payload The event data.
    */
-  (event: BaseEvent<T>): void;
+  (payload: T): void;
   /** Unique identifier for the handler instance. */
   id: symbol;
   /** Name of the class or component. */

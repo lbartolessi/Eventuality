@@ -522,7 +522,7 @@ export class Eventuality implements EventualityInterface {
     if (persistedEventsMap) {
       const event = persistedEventsMap.get(clusterKey);
       if (event) {
-        handler(event);
+        handler(event.data);
       }
     }
   }
@@ -563,7 +563,7 @@ export class Eventuality implements EventualityInterface {
   ): void {
     for (const { handler } of handlers) {
       try {
-        handler(event);
+        handler(event.data);
       } catch (error) {
         this.handleError(error as Error, event, handler);
       }
@@ -594,7 +594,7 @@ export class Eventuality implements EventualityInterface {
   ): void {
     for (const handler of handlers) {
       try {
-        handler(event);
+        handler(event.data);
       } catch (error) {
         this.handleError(error as Error, event, handler);
       }

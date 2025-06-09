@@ -4,7 +4,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
-import { BaseEvent } from './BaseEvent.js';
 import { EventHandler } from './EventHandler.js';
 
 /**
@@ -38,7 +37,7 @@ export function eventMethod<T>(options?: EventMethodOptions) {
     propertyKey: string,
 
     /** Descriptor of the original method. */
-    descriptor: TypedPropertyDescriptor<(event: BaseEvent<T>) => void>
+    descriptor: TypedPropertyDescriptor<(payload: T) => void>
   ): TypedPropertyDescriptor<EventHandler<T>> | void {
     const originalMethod = descriptor.value;
 
@@ -61,16 +60,14 @@ export function eventMethod<T>(options?: EventMethodOptions) {
        * This getter will be called the first time the decorated property is accessed on an instance.
        */
       get(): EventHandler<T> {
-        /* 'this' inside this getter refers to the instance of the class. */
         const instance = this as any;
-        /* Unique key to memoize the handler on the instance. */
         const memoizedHandlerKey = Symbol(`__eventHandler_${propertyKey}`);
         if (instance[memoizedHandlerKey]) {
           return instance[memoizedHandlerKey];
         }
 
-        const callablePart = (event: BaseEvent<T>): void => {
-          originalMethod.call(instance, event);
+        const callablePart = (payload: T): void => {
+          originalMethod.call(instance, payload);
         };
         /* This function will call the original method, ensuring the correct 'this' context. */
 
