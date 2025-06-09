@@ -1,0 +1,40 @@
+// Eventuality - Core Entity-Relationship Diagram (Style: documentation/diagrams.md)
+digraph EventualityCoreER {
+    label="Eventuality – Core Entity-Relationship Diagram"
+    labelloc=top
+    fontsize=20
+    rankdir=LR
+    node [fontname=Arial, fontsize=12, style=filled, shape=box]
+
+
+    // Entidades principales con colores del sistema
+    Eventuality [label="Eventuality\n(core bus)", fillcolor="#D1FFD1", shape=ellipse]
+    Event [label="Event\n(eventType, data, clusters)", fillcolor="#CCCCCC"]
+    Handler [label="Handler\n(eventType, cluster, callback)", fillcolor="#FFD580"]
+    Cluster [label="Cluster\n(name)", fillcolor="#B3D1FF"]
+    Subscriber [label="Subscriber", fillcolor="#B3D1FF"]
+    Publisher [label="Publisher", fillcolor="#B3D1FF"]
+
+    // Relaciones principales (nombres explícitos, flechas claras, cardinalidad)
+    Subscriber -> Handler [label="registers\n1..*", color="#888888", fontcolor="#888888"]
+    Publisher -> Event [label="publishes\n1..*", color="#888888", fontcolor="#888888"]
+    Eventuality -> Handler [label="manages\n*", color="#888888", fontcolor="#888888"]
+    Eventuality -> Event [label="stores\n*", color="#888888", fontcolor="#888888"]
+    Handler -> Event [label="handles\n1..1", style=dashed, color="#888888", fontcolor="#888888"]
+    Handler -> Cluster [label="for\n1", color="#888888", fontcolor="#888888"]
+    Event -> Cluster [label="belongs to\n1", style=dashed, color="#888888", fontcolor="#888888"]
+
+    // Leyenda compacta arriba a la derecha
+    spacer [label="", shape=box, width=0.01, height=0.01, style=invis]
+    legend [shape=none, margin=0, label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="2">
+            <TR><TD BGCOLOR="#B3D1FF">Blue: Publisher / Subscriber / Cluster</TD></TR>
+            <TR><TD BGCOLOR="#D1FFD1">Green: Eventuality (Bus)</TD></TR>
+            <TR><TD BGCOLOR="#FFD580">Orange: Handler</TD></TR>
+            <TR><TD BGCOLOR="#CCCCCC">Gray: Event</TD></TR>
+            <TR><TD>Dashed: Logical/indirect relation</TD></TR>
+        </TABLE>
+    >]
+
+    {rank=min; spacer -> legend [style=invis];}
+}

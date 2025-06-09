@@ -1,0 +1,23 @@
+// Eventuality - Sequence Diagram: Publish Event
+digraph PublishEventSequence {
+    rankdir=LR
+    node [shape=box, style=filled, fontname=Arial, fontsize=12]
+    edge [fontname=Arial, fontsize=11]
+
+    Publisher [label="Publisher", fillcolor="#B3D1FF"]
+    Eventuality [label="Eventuality (Bus)", fillcolor="#D1FFD1"]
+    SubscriptionRegistry [label="Subscription Registry", fillcolor="#F5F5F5"]
+    Handler [label="Handler(s)", fillcolor="#FFD580"]
+    EventQueue [label="Event Queue", fillcolor="#F5F5F5"]
+    PersistedEventsStore [label="Persisted Events Store", fillcolor="#F5F5F5"]
+    EventualityLogger [label="EventualityLogger", fillcolor="#A3E4D7"]
+
+    Publisher -> Eventuality [label="publish(event, clusters, persist)"]
+    Eventuality -> SubscriptionRegistry [label="find handlers"]
+    Eventuality -> EventualityLogger [label="log publish"]
+    Eventuality -> EventQueue [label="enqueue event"]
+    EventQueue -> Handler [label="dispatch to handler(s)"]
+    Handler -> EventualityLogger [label="log handler"]
+    Eventuality -> PersistedEventsStore [label="persist event if no handlers"]
+    Eventuality -> PersistedEventsStore [label="remove persisted if needed"]
+}

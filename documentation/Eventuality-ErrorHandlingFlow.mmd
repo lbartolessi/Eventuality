@@ -1,0 +1,19 @@
+---
+title: Eventuality Error Handling Flowchart
+---
+flowchart TD
+    A["Eventuality processes event"] --> B{"Error in handler?"}
+    B -- "Yes" --> C["Call handleError(error, event, handler)"]
+    C --> D{"Custom handleError provided?"}
+    D -- "Yes" --> E["User's handleError is called"]
+    D -- "No" --> F["Default error logging"]
+    B -- "No" --> G["Continue processing"]
+    E --> G
+    F --> G
+    style A fill:#A9DFBF,stroke:#2E86C1,stroke-width:2px,color:#000
+    style B fill:#F9E79F,stroke:#2E86C1,stroke-width:2px,color:#000
+    style C fill:#AED6F1,stroke:#2E86C1,stroke-width:2px,color:#000
+    style D fill:#F9E79F,stroke:#2E86C1,stroke-width:2px,color:#000
+    style E fill:#A9DFBF,stroke:#2E86C1,stroke-width:2px,color:#000
+    style F fill:#EAEAEA,stroke:#2E86C1,stroke-width:2px,color:#000
+    style G fill:#FDEBD0,stroke:#2E86C1,stroke-width:2px,color:#000

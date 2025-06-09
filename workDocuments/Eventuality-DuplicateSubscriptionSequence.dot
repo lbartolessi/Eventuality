@@ -1,0 +1,13 @@
+// Eventuality - Sequence Diagram: Handle Duplicate Subscription
+digraph DuplicateSubscriptionSequence {
+    rankdir=LR
+    node [shape=box, style=filled, fontname=Arial, fontsize=12]
+    edge [fontname=Arial, fontsize=11]
+
+    Subscriber [label="Subscriber", fillcolor="#B3D1FF"]
+    Eventuality [label="Eventuality (Bus)", fillcolor="#D1FFD1"]
+    SubscriptionRegistry [label="Subscription Registry", fillcolor="#F5F5F5"]
+
+    Subscriber -> Eventuality [label="subscribe(eventType, handler, cluster)"]
+    Eventuality -> SubscriptionRegistry [label="detect duplicate, update cluster"]
+}

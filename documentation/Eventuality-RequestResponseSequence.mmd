@@ -1,0 +1,14 @@
+---
+title: Eventuality Request-Response Sequence Diagram
+---
+sequenceDiagram
+    participant Requester as "Requester (Component)"
+    participant Eventuality as "Eventuality (Event Bus)"
+    participant Handler as "Handler (Responder)"
+    Requester->>Eventuality: request({targetEvent, handler, cluster}, clusters)
+    Eventuality->>Handler: subscribe(targetEvent, handler, cluster)
+    Eventuality->>Eventuality: publish(RequestEvent, clusters, persist=true)
+    Handler->>Eventuality: (on event) handler(targetEvent)
+    Note right of Handler: Handler processes and responds to event
+    Eventuality-->>Requester: (optional) Log request if debugMode
+    %% Text color is not natively supported in sequenceDiagram, pero los labels son claros.

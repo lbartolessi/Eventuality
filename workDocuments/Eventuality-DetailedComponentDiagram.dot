@@ -1,0 +1,84 @@
+// Eventuality - Detailed Component Diagram (DOT style, following diagrams.md conventions)
+digraph EventualityComponentDiagram {
+    label="Eventuality – Detailed Component Diagram"
+    labelloc=top
+    fontsize=20
+    rankdir=TB
+    node [fontname=Arial, fontsize=12, style=filled, shape=component]
+
+    // Main components
+    Eventuality [label="Eventuality\n(core bus)", fillcolor="#D1FFD1"]
+    EventualityInterface [label="EventualityInterface\n(API contract)", fillcolor="#D2B4DE", shape=box]
+    EventualityLogger [label="EventualityLogger\n(Debug/Trace)", fillcolor="#A3E4D7"]
+    EventualityError [label="EventualityError\n(Custom error)", fillcolor="#F5B7B1"]
+    EventualityOptions [label="EventualityOptions\n(Config)", fillcolor="#FAD7A0", shape=box]
+    EventQueue [label="Event Queue\n(FIFO, async)", fillcolor="#F5F5F5", shape=box]
+    SubscriptionRegistry [label="Subscription Registry\n(Handlers by eventType/cluster)", fillcolor="#F5F5F5", shape=box]
+    PersistedEventsStore [label="Persisted Events Store\n(Events by eventType/cluster)", fillcolor="#F5F5F5", shape=box]
+    Decorators [label="Decorators\n(@eventMethod, etc.)", fillcolor="#E8DAEF"]
+    Event [label="Event", fillcolor="#CCCCCC", shape=box]
+    Handler [label="Handler", fillcolor="#FFD580", shape=box]
+    Cluster [label="Cluster", fillcolor="#B3D1FF", shape=box]
+    RequestDetails [label="RequestDetails", fillcolor="#F5F5F5", shape=box]
+    EventHandler [label="EventHandler", fillcolor="#F5F5F5", shape=box]
+    RequestEvent [label="RequestEvent", fillcolor="#D2B4DE", shape=box]
+    RequestEventData [label="RequestEventData", fillcolor="#D2B4DE", shape=box]
+
+    // Actors
+    Publisher [label="Publisher", fillcolor="#B3D1FF", shape=ellipse]
+    Subscriber [label="Subscriber", fillcolor="#B3D1FF", shape=ellipse]
+
+    // External API
+    Publisher -> EventualityInterface [label="calls"]
+    Subscriber -> EventualityInterface [label="calls"]
+    EventualityInterface -> Eventuality [label="implemented by", style=dashed]
+
+    // Core bus uses
+    Eventuality -> EventualityLogger [label="logs to"]
+    Eventuality -> EventualityError [label="throws"]
+    Eventuality -> EventualityOptions [label="reads config"]
+    Eventuality -> EventQueue [label="queues events"]
+    Eventuality -> SubscriptionRegistry [label="manages handlers"]
+    Eventuality -> PersistedEventsStore [label="persists events"]
+    Eventuality -> Decorators [label="uses", style=dashed]
+    Eventuality -> RequestDetails [label="uses", style=dashed]
+    Eventuality -> EventHandler [label="invokes", style=dashed]
+
+    // Data flow
+    Eventuality -> Event [label="creates/reads"]
+    Eventuality -> Handler [label="creates/reads"]
+    Handler -> Cluster [label="for"]
+    Handler -> EventHandler [label="is a", style=dashed]
+    Event -> Cluster [label="belongs to"]
+    RequestDetails -> Event [label="target"]
+    RequestDetails -> EventHandler [label="handler"]
+    RequestEvent -> RequestEventData [label="data"]
+    RequestEventData -> Event [label="targetEvent"]
+    RequestEventData -> EventHandler [label="handler"]
+
+    // Decorators
+    Decorators -> EventHandler [label="creates", style=dashed]
+
+    // Internal stores
+    EventQueue -> Event [label="stores"]
+    SubscriptionRegistry -> Handler [label="stores"]
+    PersistedEventsStore -> Event [label="stores"]
+
+    // Legend
+    legend [shape=none, margin=0, label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="2">
+            <TR><TD BGCOLOR="#D1FFD1">Green: Core bus/component</TD></TR>
+            <TR><TD BGCOLOR="#D2B4DE">Purple: Interface/contract</TD></TR>
+            <TR><TD BGCOLOR="#CCCCCC">Gray: Event</TD></TR>
+            <TR><TD BGCOLOR="#FFD580">Orange: Handler</TD></TR>
+            <TR><TD BGCOLOR="#B3D1FF">Blue: Cluster, Publisher, Subscriber</TD></TR>
+            <TR><TD BGCOLOR="#FAD7A0">Yellow: Options/config</TD></TR>
+            <TR><TD BGCOLOR="#A3E4D7">Cyan: Logger</TD></TR>
+            <TR><TD BGCOLOR="#F5B7B1">Red: Error</TD></TR>
+            <TR><TD BGCOLOR="#E8DAEF">Violet: Decorator</TD></TR>
+            <TR><TD BGCOLOR="#F5F5F5">Light Gray: Internal store/aux</TD></TR>
+            <TR><TD>Dashed: Indirect or interface relation</TD></TR>
+        </TABLE>
+    >]
+    {rank=min; legend}
+}

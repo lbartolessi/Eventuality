@@ -1,0 +1,13 @@
+// Eventuality - Sequence Diagram: Remove Persisted Event
+digraph RemovePersistedEventSequence {
+    rankdir=LR
+    node [shape=box, style=filled, fontname=Arial, fontsize=12]
+    edge [fontname=Arial, fontsize=11]
+
+    Publisher [label="Publisher", fillcolor="#B3D1FF"]
+    Eventuality [label="Eventuality (Bus)", fillcolor="#D1FFD1"]
+    PersistedEventsStore [label="Persisted Events Store", fillcolor="#F5F5F5"]
+
+    Publisher -> Eventuality [label="publish(event, clusters, persist=false)"]
+    Eventuality -> PersistedEventsStore [label="remove persisted event(s)"]
+}

@@ -1,0 +1,124 @@
+@startuml Eventuality Use Case Diagram
+!theme vibrant
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam note {
+    BackgroundColor LightCyan
+    BorderColor RoyalBlue
+    FontColor Black
+}
+skinparam usecase {
+    BackgroundColor LightYellow
+    BorderColor DarkGoldenRod
+    FontColor Black
+}
+
+
+actor "Client Component" as Client
+
+rectangle "Eventuality System" {
+  usecase "UC1: Initialize System" as UC_Init
+  usecase "UC1.1: Set Debug Mode" as UC_SetDebug
+  usecase "UC1.2: Set Global Error Handler" as UC_SetErrorHandler
+  usecase "UC1.3: Set Persisted Event Loader" as UC_SetLoader
+  usecase "UC1.4: Set Persisted Event Saver" as UC_SetSaver
+
+  note bottom of UC_Init
+    Configures system-wide behaviors and
+    interfaces for persistence.
+    (Ref: FR1.1)
+    - Debug Mode (FR1.1.1)
+    - Global Error Handler (FR1.1.2)
+    - Persisted Event Loader (FR1.1.3)
+    - Persisted Event Saver (FR1.1.4)
+  end note
+
+  usecase "UC2: Publish Event" as UC_Publish
+  note right of UC_Publish
+    **Client provides:** eventType, data, clusters, persist flag.
+    (Ref: FR1.2)
+    ---
+    **System Actions (Conceptual):**
+    1. Event is enqueued (FR1.6.1).
+    2. Event is processed asynchronously from queue (FR1.6.2):
+       a. **Persistence Handling:**
+          - If `persist` is true: Store event for its `eventType` & each target `cluster`
+            (via Persisted Event Saver, overwrites existing) (FR1.6.4.1).
+          - If `persist` is false: Remove any prior persisted event for `eventType` & its target `clusters`
+            (via Persisted Event Saver) (FR1.6.4.2).
+       b. **Handler Identification:**
+          - Identify subscribed handlers where publication clusters intersect
+            with subscription clusters (non-empty intersection, or `*` wildcard match)
+            (FR1.6.4.3.1, FR1.6.4.3.2).
+       c. **Handler Invocation:**
+          - Invoke each matching handler (at most once per publication, async)
+            (FR1.6.4.3.3, FR1.6.5).
+       d. **Error Management:**
+          - Handler errors are caught & passed to Global Error Handler (FR1.6.6, FR1.6.7).
+       e. **Logging:**
+          - Log delivery if Debug Mode is enabled (FR1.6.9).
+  end note
+
+  usecase "UC3: Subscribe to Event" as UC_Subscribe
+  usecase "UC3.1: Receive Initial Persisted Event" as UC_ReceivePersisted
+  note right of UC_Subscribe
+    **Client provides:** eventType, handler function, clusters.
+    (Ref: FR1.4)
+    ---
+    **System Actions (Conceptual):**
+    1. **Subscription Management:**
+       - The handler (identified by `id: symbol`) for a given `eventType`
+         is associated with the new set of `clusters`.
+       - If a subscription for this handler and `eventType` already exists,
+         its cluster set is replaced by the new one (FR1.4.5).
+    2. **Initial Persisted Event Delivery (triggers UC3.1):**
+       - If a Persisted Event Loader is configured and a persisted event
+         exists for the `eventType` and any of the subscribed `clusters`
+         (or `*` match), the handler is invoked with that event data (FR1.4.6).
+  end note
+
+  usecase "UC4: Unsubscribe from Event" as UC_Unsubscribe
+  note right of UC_Unsubscribe
+    **Client provides:** eventType, handler id.
+    (Ref: FR1.5)
+    ---
+    **System Actions (Conceptual):**
+    Removes the specified handler's
+    subscription for the given event type.
+  end note
+
+  usecase "UC5: Get System Instance" as UC_GetInstance
+  note right of UC_GetInstance
+    Provides access to the
+    Eventuality singleton instance.
+    (Ref: FR1.0)
+  end note
+
+  usecase "UC6: Clear All System Data" as UC_ClearData
+  note right of UC_ClearData
+    Resets the system's state for
+    testing or re-initialization.
+    (Ref: FR1.7)
+    - Clears all subscriptions.
+    - Clears all persisted events.
+    - Clears the event queue.
+  end note
+}
+
+Client --> UC_Init
+UC_Init <. UC_SetDebug : <<include>>
+UC_Init <. UC_SetErrorHandler : <<include>>
+UC_Init <. UC_SetLoader : <<include>>
+UC_Init <. UC_SetSaver : <<include>>
+
+Client --> UC_Publish
+
+Client --> UC_Subscribe
+UC_Subscribe ..> UC_ReceivePersisted : <<extend>>\n(if persisted event exists\n and matches clusters)
+
+Client --> UC_Unsubscribe
+Client --> UC_GetInstance
+Client --> UC_ClearData
+
+@enduml

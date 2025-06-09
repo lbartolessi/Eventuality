@@ -1,0 +1,21 @@
+flowchart LR
+subgraph "Online Shopping"
+uc1((View items))
+uc2((Make purchase))
+uc3((Complete Checkout))
+uc4((Log In))
+end
+customer[Customer👤]
+credit[credit_payment_service 💳]
+id[identity_provider🆔]
+sa[service_authentification🔑]
+pa[paypal💲]
+id--->uc1
+sa--->uc1
+customer----->uc1
+customer-->uc2
+uc2 -. include .-> uc1
+uc2 -. include .-> uc3
+credit---->uc3
+pa---->uc3
+customer--->uc4

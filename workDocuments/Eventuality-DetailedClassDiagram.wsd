@@ -1,0 +1,179 @@
+@startuml
+' Based on documentation/Eventuality-DetailedClassDiagram.md
+title Eventuality – Detailed Class Diagram
+
+skinparam defaultFontName Roboto
+skinparam class {
+  FontName Roboto
+  FontSize 12
+  BorderColor #5D6D7E
+  FontColor #34495E
+}
+skinparam interface {
+  FontName Roboto
+  FontSize 12
+  BorderColor #5D6D7E
+  FontColor #34495E
+}
+skinparam entity {
+  FontName Roboto
+  FontSize 12
+  BorderColor #5D6D7E
+  FontColor #34495E
+}
+skinparam arrow {
+  FontName Roboto
+  FontSize 11
+  Color #5D6D7E
+}
+
+interface EventualityInterface <<interface>> #D2B4DE {
+  +publish()
+  +subscribe()
+  +unsubscribe()
+  +request()
+}
+
+class Eventuality #D1FFD1 {
+  +publish()
+  +subscribe()
+  +unsubscribe()
+  +request()
+  -debugMode: boolean
+  -waitTimeout: number
+}
+
+interface BaseEvent<T> <<interface>> #D2B4DE {
+  +eventType: string
+  +data: T
+}
+
+interface EventHandler<T> <<interface>> #D2B4DE {
+  +(event: BaseEvent<T>): void
+  +id: symbol
+  +className: string
+  +tagName?: string
+}
+
+interface RequestEventData<D> <<interface>> #D2B4DE {
+  +targetEvent: BaseEvent<D>
+  +handler: EventHandler<D>
+  +cluster: string
+}
+
+interface RequestEvent<D> <<interface>> #D2B4DE {
+  +eventType: 'REQUEST_EVENT'
+  +data: RequestEventData<D>
+}
+
+class EventualityOptions #FAD7A0 {
+  +debugMode?: boolean
+  +defaultPersist?: boolean
+  +handleError?: (error, event) => void
+  +waitTimeout?: number
+}
+
+class EventualityClass #D1FFD1 {
+  - instance: EventualityInterface | null
+  +debugMode: boolean
+  +waitTimeout: number
+  +getInstance() {static}
+  +_resetInstance() {static}
+  +isDebugMode()
+  +publish()
+  +subscribe()
+  +unsubscribe()
+  +request()
+}
+
+class EventualityLogger #A3E4D7 {
+  +publishLog() {static}
+  +subscribeLog() {static}
+  +requestLog() {static}
+  +unsubscribeLog() {static}
+  +eventHandlerLog() {static}
+}
+
+class EventualityError #F5B7B1 {
+  +name: string = 'EventualityError'
+  +constructor(message: string)
+}
+
+class Event #CCCCCC {
+  +eventType: string
+  +data: any
+  +clusters: Set<string>
+}
+
+class Handler #FFD580 {
+  +eventType: string
+  +cluster: string
+  +callback: EventHandler
+}
+
+class Cluster #B3D1FF {
+  +name: string
+}
+
+class RequestDetails #F5F5F5 {
+  +targetEvent: Event
+  +handler: EventHandler
+  +cluster: string
+}
+
+class EventMethodDecorator <<Decorator>> #E8DAEF {
+  + (options?) {static}
+}
+
+class EventMethodOptions #FAD7A0 {
+  +tagNameSource?: string | fn
+}
+
+entity Publisher #B3D1FF
+entity Subscriber #B3D1FF
+
+' Relationships
+Publisher --> Eventuality : uses
+Subscriber --> Eventuality : uses
+
+Eventuality ..|> EventualityInterface : implements
+EventualityClass ..> EventualityOptions : uses
+EventualityClass ..> EventualityLogger : uses
+EventualityClass ..> EventualityError : may throw
+EventualityClass ..> Event : persists
+EventualityClass ..> Handler : manages
+Handler ..|> EventHandler : implements
+Handler --> Cluster : for
+Handler ..> Event : handles
+Event ..> Cluster : belongs to
+EventualityLogger ..> BaseEvent : logs
+EventualityLogger ..> EventHandler : logs
+EventualityLogger ..> RequestEvent : logs
+EventualityLogger ..> RequestEventData : logs
+EventualityOptions ..> BaseEvent : uses in handleError
+EventualityInterface ..> BaseEvent : uses in methods
+EventualityInterface ..> EventHandler : uses in methods
+EventualityInterface ..> RequestEvent : uses in request()
+RequestEventData ..> BaseEvent : uses
+RequestEventData ..> EventHandler : uses
+RequestEvent ..> RequestEventData : uses
+EventMethodDecorator ..> EventMethodOptions : uses (optional)
+EventMethodDecorator ..> BaseEvent : uses in method
+EventMethodDecorator ..> EventHandler : creates
+
+legend right
+  |= Color |= Element |
+  |<#D1FFD1>| Green: Eventuality (Bus) |
+  |<#CCCCCC>| Gray: Event |
+  |<#FFD580>| Orange: Handler |
+  |<#B3D1FF>| Blue: Cluster, Publisher, Subscriber |
+  |<#D2B4DE>| Purple: Interface |
+  |<#FAD7A0>| Yellow: Options |
+  |<#A3E4D7>| Cyan: Logger |
+  |<#F5B7B1>| Red: Error |
+  |<#E8DAEF>| Violet: Decorator |
+  |<#F5F5F5>| Light Gray: Aux |
+  |<#FFFFFF>| Dashed: Interface/indirect relation |
+end legend
+
+@enduml

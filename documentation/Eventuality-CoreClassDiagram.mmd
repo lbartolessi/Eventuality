@@ -1,0 +1,58 @@
+---
+title: Eventuality Core Class Diagram
+---
+classDiagram
+    class Eventuality {
+        +boolean debugMode
+        +number waitTimeout
+        +publish(event, clusters, persist)
+        +subscribe(event, handler, cluster)
+        +unsubscribe(event, handler)
+        +request(requestDetails, clustersToPublishRequestEvent)
+        +static getInstance(options)
+        +static createInstance(options)
+    }
+    class EventualityLogger {
+        +publishLog(event, clusters, hasSubscriptions)
+        +subscribeLog(event, handler, clusters)
+        +unsubscribeLog(event, handler)
+        +requestLog(request, clusters)
+        +eventHandlerLog(event, handler)
+    }
+    class BaseEvent {
+        +string eventType
+        +T data
+    }
+    class EventHandler {
+        +symbol id
+        +string className
+        +string tagName
+        +(event)
+    }
+    class RequestEvent {
+        +string eventType
+        +RequestEventData data
+    }
+    class RequestEventData {
+        +BaseEvent targetEvent
+        +EventHandler handler
+        +string cluster
+    }
+    EventualityLogger <.. Eventuality : uses
+    BaseEvent <|-- RequestEvent
+    RequestEventData <.. RequestEvent : contains
+    EventHandler <.. RequestEventData : contains
+    BaseEvent <.. RequestEventData : contains
+    style Eventuality fill:#F9E79F,stroke:#2E86C1,stroke-width:2px,color:#000
+    style EventualityLogger fill:#D2B4DE,stroke:#2E86C1,stroke-width:2px,color:#000
+    style BaseEvent fill:#AED6F1,stroke:#2E86C1,stroke-width:2px,color:#000
+    style EventHandler fill:#A9DFBF,stroke:#2E86C1,stroke-width:2px,color:#000
+    style RequestEvent fill:#FDEBD0,stroke:#2E86C1,stroke-width:2px,color:#000
+    style RequestEventData fill:#EAEAEA,stroke:#2E86C1,stroke-width:2px,color:#000
+    %% Notes
+    note for Eventuality "Main event bus singleton. Manages event queue, subscriptions, persistence, and error handling."
+    note for BaseEvent~T~ "Generic event structure. All events must extend this."
+    note for EventHandler~T~ "Handler function with metadata. Must have unique id."
+    note for EventualityLogger "Internal logger for debug mode. Not required for core logic."
+    note for RequestEvent~D~ "Special event for request-response pattern."
+    note for RequestEventData~D~ "Data structure for request events."

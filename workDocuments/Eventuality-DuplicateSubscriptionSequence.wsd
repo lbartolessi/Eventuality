@@ -1,0 +1,40 @@
+@startuml ' Based on documentation/Eventuality-DuplicateSubscriptionSequence.md
+title Eventuality – Sequence Diagram: Handle Duplicate Subscription
+
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+skinparam defaultFontName Roboto
+skinparam actor {
+  FontName Roboto
+  FontSize 12
+  BorderColor #5D6D7E
+  FontColor #34495E
+}
+skinparam participant {
+  FontName Roboto
+  FontSize 12
+  BorderColor #5D6D7E
+  FontColor #34495E
+}
+skinparam sequence {
+  ArrowFontName Roboto
+  ArrowFontSize 11
+  ArrowColor #5D6D7E
+  LifeLineBorderColor #5D6D7E
+}
+
+actor Subscriber #B3D1FF
+participant "Eventuality (Bus)" #D1FFD1
+participant "Subscription Registry" #F5F5F5
+
+Subscriber -> "Eventuality (Bus)" : subscribe(eventType, handler, cluster)
+"Eventuality (Bus)" -> "Subscription Registry" : detect duplicate, update cluster
+
+legend right
+  |= Color |= Element |
+  |<#B3D1FF>| Blue: Subscriber |
+  |<#D1FFD1>| Green: Eventuality (Bus) |
+  |<#F5F5F5>| Light Gray: Store |
+end legend
+
+@enduml

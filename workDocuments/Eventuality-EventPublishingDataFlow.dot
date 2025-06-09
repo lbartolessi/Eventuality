@@ -1,0 +1,111 @@
+// Eventuality - Event Publishing Data Flow (with subscribe to target event for REQUEST_EVENT)
+digraph detailed_event_flow {
+    label="Eventuality - Event Publishing Data Flow"
+    labelloc=top
+    fontsize=20
+    rankdir=TB
+    node [style=filled, fontname=Arial, shape=box]
+
+    graph [
+        size="8.3,11.7",
+        ratio=fill,
+        page="11.7,8.3",
+        margin=0.2,
+        orientation=portrait
+    ]
+
+    Publisher [label="Publisher", fillcolor="#B3D1FF"]
+    Eventuality [label="Eventuality\n(internal queue)", fillcolor="#D1FFD1", shape=ellipse]
+    HandlerFilter [label="Filter handlers:\nhandler.eventType == event.eventType", fillcolor="#D1FFD1"]
+    ClusterSelector [label="Select handlers by cluster:\n(event.clusters includes '*') ?\n  all handlers :\n  handler.cluster == '*' OR handler.cluster IN event.clusters", fillcolor="#D1FFD1"]
+    Handlers [label="Matching handlers", fillcolor="#FFD580"]
+    DecisionHandlers [label="Are there 0 handlers?", shape=diamond, fillcolor="#FFF2CC"]
+
+    // Persist Events box for no handlers
+    PersistEventsNoHandlers [label=<
+      <B>Persist Events</B><br/>
+      <FONT POINT-SIZE="10">Store/overwrite event for each cluster in event.clusters.<br/>Leave other clusters untouched.</FONT>
+    >, shape=box, fillcolor="#CCCCCC"]
+
+    // Handler queue and loop
+    HandlerQueue [label="Create queue of selected handlers", fillcolor="#FFD580"]
+    StartLoop [label="(Start Loop)\nPop handler from queue", fillcolor="#FFD580"]
+
+    // Persist Events box for main loop
+    PersistEvents [label=<
+      <B>Persist Events</B><br/>
+      <FONT POINT-SIZE="10">For each cluster in event.clusters:<br/>Store/overwrite event for that cluster.<br/>Leave other clusters untouched.</FONT>
+    >, shape=box, fillcolor="#CCCCCC"]
+
+    // Remove Events box
+    RemoveEvents [label=<
+      <B>Remove Events</B><br/>
+      <FONT POINT-SIZE="10">For each cluster in event.clusters:<br/>Delete persisted event for that cluster.<br/>Leave other clusters untouched.</FONT>
+    >, shape=box, fillcolor="#CCCCCC"]
+
+    // New: Subscribe to target event (for REQUEST_EVENT)
+    SubscribeTarget [label=<
+      <B>Subscribe to target event</B><br/>
+      <FONT POINT-SIZE="10">Extract targetEvent, cluster, handler from payload<br/>
+      and subscribe(targetEvent, handler, cluster)</FONT>
+    >, shape=box, fillcolor="#CCCCCC"]
+
+    DecisionPersist [label="persist parameter:\ntrue? → Yes\nfalse? → No\nundefined? → use this.persistDefault", shape=diamond, fillcolor="#FFF2CC"]
+    DecisionPersistDefault [label="this.persistDefault == true?", shape=diamond, fillcolor="#FFF2CC"]
+    DecisionRequest [label="eventType == 'REQUEST_EVENT'?", shape=diamond, fillcolor="#FFF2CC"]
+
+    Handler [label="Handler executes callback", fillcolor="#FFD580"]
+    DecisionUltimo [label="Last handler?", shape=diamond, fillcolor="#FFF2CC"]
+    Exit [label="(End of flow)", shape=box, fillcolor="#CCCCCC"]
+
+    // Main flow
+    Publisher -> Eventuality [label="publish(event, clusters, persist) [3.3.3]"]
+    Eventuality -> HandlerFilter [label="Filter by event type"]
+    HandlerFilter -> ClusterSelector [label="Filter by cluster"]
+    ClusterSelector -> Handlers [label="Matching handlers"]
+    Handlers -> DecisionHandlers
+
+    // If no handlers, persist and finish
+    DecisionHandlers -> PersistEventsNoHandlers [label="Yes"]
+    PersistEventsNoHandlers -> Exit
+
+    // If there are handlers, create queue and start loop
+    DecisionHandlers -> HandlerQueue [label="No"]
+    HandlerQueue -> StartLoop
+    StartLoop -> DecisionPersist
+
+    // Expanded persist logic in loop
+    DecisionPersist -> PersistEvents [label="Yes (persist==true)"]
+    DecisionPersist -> DecisionPersistDefault [label="No (persist==undefined)"]
+    DecisionPersist -> DecisionRequest [label="No (persist==false)"]
+
+    DecisionPersistDefault -> PersistEvents [label="Yes"]
+    DecisionPersistDefault -> DecisionRequest [label="No"]
+
+    // Insert subscribe to target event after persist for REQUEST_EVENT
+    DecisionRequest -> PersistEvents [label="Yes"]
+    PersistEvents -> SubscribeTarget [label="(REQUEST_EVENT)"]
+    SubscribeTarget -> Handler
+    DecisionRequest -> RemoveEvents [label="No"]
+    RemoveEvents -> Handler
+
+    Handler -> DecisionUltimo
+
+    DecisionUltimo -> Exit [label="Yes"]
+    DecisionUltimo -> StartLoop [label="No (next handler)"]
+
+    // Compact vertical legend aligned to the top right
+    spacer [label="", shape=box, width=5, style=invis]
+    legend [shape=none, margin=0, label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="2">
+            <TR><TD BGCOLOR="#B3D1FF">Blue: Publisher</TD></TR>
+            <TR><TD BGCOLOR="#D1FFD1">Green: Logic</TD></TR>
+            <TR><TD BGCOLOR="#FFD580">Orange: Handler</TD></TR>
+            <TR><TD BGCOLOR="#CCCCCC">Gray: Persistence/Subscription</TD></TR>
+            <TR><TD BGCOLOR="#FFF2CC">Yellow: Decision</TD></TR>
+        </TABLE>
+    >]
+
+    // Place legend at the top right, separated by spacer
+    {rank=min; spacer -> legend [style=invis];}
+}

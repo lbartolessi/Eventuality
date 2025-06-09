@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", // Compatible with modern browsers
+    "module": "NodeNext", // Produces ES modules
+    "moduleResolution": "NodeNext", // How TS resolves modules (e.g., import .js)
+    "declaration": true,
+    "emitDeclarationOnly": false, // Generates declaration files alongside the compiled JavaScript
+    "declarationDir": "dist/types",
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": ".", // Specifies the root directory of input files. Used to control the output directory structure with --outDir.
+    "strict": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true, // Enables experimental support for ES decorators.
+    "emitDecoratorMetadata": true, // Enables experimental support for emitting type metadata for decorators.
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "examples/*": ["examples/*"]
+    },
+    "lib": ["ESNext", "DOM"] // Includes types for the DOM
+  },
+  "include": ["src/**/*"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test",
+    "examples",
+    "**/*.config.ts",
+    "**/*.config.cjs",
+    "**/*.config.js",
+    "vite.config.ts",
+    "vite.config.cjs",
+    "vite.config.js"
+  ]
+}

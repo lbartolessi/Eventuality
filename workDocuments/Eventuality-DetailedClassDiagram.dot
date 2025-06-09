@@ -1,0 +1,81 @@
+// Eventuality - Detailed Class Diagram (DOT style, simplified for clarity)
+digraph EventualityDetailedClassDiagram {
+    label="Eventuality – Detailed Class Diagram"
+    labelloc=top
+    fontsize=20
+    rankdir=TB
+    node [fontname=Arial, fontsize=12, style=filled, shape=box]
+
+    // Core classes and interfaces
+    Eventuality [label="Eventuality\n+publish()\n+subscribe()\n+unsubscribe()\n+request()\n-debugMode: boolean\n-waitTimeout: number", fillcolor="#D1FFD1", shape=ellipse]
+    EventualityInterface [label="<<interface>>\nEventualityInterface\n+publish()\n+subscribe()\n+unsubscribe()\n+request()", fillcolor="#D2B4DE"]
+    BaseEvent [label="<<interface>>\nBaseEvent<T>\n+eventType: string\n+data: T", fillcolor="#D2B4DE"]
+    EventHandler [label="<<interface>>\nEventHandler<T>\n+(event: BaseEvent<T>): void\n+id: symbol\n+className: string\n+tagName?: string", fillcolor="#D2B4DE"]
+    RequestEventData [label="<<interface>>\nRequestEventData<D>\n+targetEvent: BaseEvent<D>\n+handler: EventHandler<D>\n+cluster: string", fillcolor="#D2B4DE"]
+    RequestEvent [label="<<interface>>\nRequestEvent<D>\n+eventType: 'REQUEST_EVENT'\n+data: RequestEventData<D>", fillcolor="#D2B4DE"]
+    EventualityOptions [label="<<interface>>\nEventualityOptions\n+debugMode?: boolean\n+defaultPersist?: boolean\n+handleError?: (error, event) => void\n+waitTimeout?: number", fillcolor="#FAD7A0"]
+
+    // Core implementation
+    EventualityClass [label="Eventuality (class)\n- instance: EventualityInterface | null\n+debugMode: boolean\n+waitTimeout: number\n+getInstance()\n+_resetInstance()\n+isDebugMode()\n+publish()\n+subscribe()\n+unsubscribe()\n+request()", fillcolor="#D1FFD1", shape=ellipse]
+    EventualityLogger [label="EventualityLogger\n+publishLog()\n+subscribeLog()\n+requestLog()\n+unsubscribeLog()\n+eventHandlerLog()", fillcolor="#A3E4D7"]
+    EventualityError [label="EventualityError\n+name: string = 'EventualityError'\n+constructor(message: string)", fillcolor="#F5B7B1"]
+    Event [label="Event\n+eventType: string\n+data: any\n+clusters: Set<string>", fillcolor="#CCCCCC"]
+    Handler [label="Handler\n+eventType: string\n+cluster: string\n+callback: EventHandler", fillcolor="#FFD580"]
+    Cluster [label="Cluster\n+name: string", fillcolor="#B3D1FF"]
+    RequestDetails [label="RequestDetails\n+targetEvent: Event\n+handler: EventHandler\n+cluster: string", fillcolor="#F5F5F5"]
+
+    // Decorator
+    EventMethodDecorator [label="<<Decorator>>\neventMethod<T>\n+ (options?)", fillcolor="#E8DAEF"]
+    EventMethodOptions [label="EventMethodOptions\n+tagNameSource?: string | fn", fillcolor="#FAD7A0"]
+
+    // Actors
+    Publisher [label="Publisher", fillcolor="#B3D1FF", shape=ellipse]
+    Subscriber [label="Subscriber", fillcolor="#B3D1FF", shape=ellipse]
+
+    // Relationships
+    Publisher -> Eventuality [label="uses"]
+    Subscriber -> Eventuality [label="uses"]
+
+    Eventuality -> EventualityInterface [label="implements", style=dashed]
+    EventualityClass -> EventualityOptions [label="uses", style=dashed]
+    EventualityClass -> EventualityLogger [label="uses", style=dashed]
+    EventualityClass -> EventualityError [label="may throw", style=dashed]
+    EventualityClass -> Event [label="persists", style=dashed]
+    EventualityClass -> Handler [label="manages", style=dashed]
+    Handler -> EventHandler [label="implements", style=dashed]
+    Handler -> Cluster [label="for"]
+    Handler -> Event [label="handles", style=dashed]
+    Event -> Cluster [label="belongs to", style=dashed]
+    EventualityLogger -> BaseEvent [label="logs", style=dashed]
+    EventualityLogger -> EventHandler [label="logs", style=dashed]
+    EventualityLogger -> RequestEvent [label="logs", style=dashed]
+    EventualityLogger -> RequestEventData [label="logs", style=dashed]
+    EventualityOptions -> BaseEvent [label="uses in handleError", style=dashed]
+    EventualityInterface -> BaseEvent [label="uses in methods", style=dashed]
+    EventualityInterface -> EventHandler [label="uses in methods", style=dashed]
+    EventualityInterface -> RequestEvent [label="uses in request()", style=dashed]
+    RequestEventData -> BaseEvent [label="uses", style=dashed]
+    RequestEventData -> EventHandler [label="uses", style=dashed]
+    RequestEvent -> RequestEventData [label="uses", style=dashed]
+    EventMethodDecorator -> EventMethodOptions [label="uses (optional)", style=dashed]
+    EventMethodDecorator -> BaseEvent [label="uses in method", style=dashed]
+    EventMethodDecorator -> EventHandler [label="creates", style=dashed]
+
+    // Legend
+    legend [shape=none, margin=0, label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="2">
+            <TR><TD BGCOLOR="#D1FFD1">Green: Eventuality (Bus)</TD></TR>
+            <TR><TD BGCOLOR="#CCCCCC">Gray: Event</TD></TR>
+            <TR><TD BGCOLOR="#FFD580">Orange: Handler</TD></TR>
+            <TR><TD BGCOLOR="#B3D1FF">Blue: Cluster, Publisher, Subscriber</TD></TR>
+            <TR><TD BGCOLOR="#D2B4DE">Purple: Interface</TD></TR>
+            <TR><TD BGCOLOR="#FAD7A0">Yellow: Options</TD></TR>
+            <TR><TD BGCOLOR="#A3E4D7">Cyan: Logger</TD></TR>
+            <TR><TD BGCOLOR="#F5B7B1">Red: Error</TD></TR>
+            <TR><TD BGCOLOR="#E8DAEF">Violet: Decorator</TD></TR>
+            <TR><TD BGCOLOR="#F5F5F5">Light Gray: Aux</TD></TR>
+            <TR><TD>Dashed: Interface/indirect relation</TD></TR>
+        </TABLE>
+    >]
+    {rank=min; legend}
+}

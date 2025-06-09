@@ -1,0 +1,48 @@
+@startuml oo
+' Based on documentation/Eventuality-RequestEventSequence.md
+title Eventuality – Sequence Diagram: Request-Response Pattern
+
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+skinparam defaultFontName Roboto
+skinparam actor {
+  FontName Roboto
+  FontSize 12
+  BorderColor #5D6D7E
+  FontColor #34495E
+}
+skinparam participant {
+  FontName Roboto
+  FontSize 12
+  BorderColor #5D6D7E
+  FontColor #34495E
+}
+skinparam sequence {
+  ArrowFontName Roboto
+  ArrowFontSize 11
+  ArrowColor #5D6D7E
+  LifeLineBorderColor #5D6D7E
+}
+
+actor Publisher #B3D1FF
+participant "Eventuality (Bus)" #D1FFD1
+participant "Subscription Registry" #F5F5F5
+participant Handler #FFD580
+participant "Persisted Events Store" #F5F5F5
+
+Publisher -> "Eventuality (Bus)" : request(requestDetails, clusters)
+"Eventuality (Bus)" -> "Subscription Registry" : auto-subscribe handler to target event
+"Eventuality (Bus)" -> "Persisted Events Store" : persist REQUEST_EVENT
+"Eventuality (Bus)" -> Handler : dispatch REQUEST_EVENT
+Handler -> "Eventuality (Bus)" : publish response event
+"Eventuality (Bus)" -> Handler : deliver response to original handler
+
+legend right
+  |= Color |= Element |
+  |<#B3D1FF>| Blue: Publisher |
+  |<#D1FFD1>| Green: Eventuality (Bus) |
+  |<#F5F5F5>| Light Gray: Store |
+  |<#FFD580>| Orange: Handler |
+end legend
+
+@enduml

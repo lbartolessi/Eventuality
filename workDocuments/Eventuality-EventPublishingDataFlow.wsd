@@ -1,0 +1,71 @@
+@startuml Eventuality-EventPublishingDataFlow-Sequence
+' Eventuality - Event Publishing Data Flow (Sequence)
+' Based on Eventuality-EventPublishingDataFlow.md and diagrams.md
+
+!define COLOR_ACTOR #2E86C1
+!define COLOR_COMPONENT #F9E79F
+!define COLOR_DATABASE #AED6F1
+!define COLOR_NOTE #EAEAEA
+
+skinparam backgroundColor #FDEBD0
+skinparam defaultFontName "Roboto"
+skinparam participant {
+  BackgroundColor COLOR_COMPONENT
+  BorderColor Black
+}
+skinparam actor {
+  BackgroundColor COLOR_ACTOR
+  BorderColor Black
+}
+skinparam database {
+  BackgroundColor COLOR_DATABASE
+  BorderColor Black
+}
+skinparam note {
+  BackgroundColor COLOR_NOTE
+  BorderColor Black
+}
+
+actor Publisher as PUB #2E86C1
+participant "Eventuality" as EVENTUALITY #F9E79F
+participant "Handlers Registry" as REGISTRY #F9E79F
+participant "Handler" as HANDLER #F9E79F
+database "Persisted Events Store" as STORE #AED6F1
+
+PUB -> EVENTUALITY : publish(event, clusters, persist)
+EVENTUALITY -> REGISTRY : getHandlers(eventType)
+REGISTRY --> EVENTUALITY : matchingHandlers
+EVENTUALITY -> EVENTUALITY : filterHandlersByCluster(clusters)
+
+alt No matching handlers
+  EVENTUALITY -> STORE : persistEvent(event, clusters)
+  note right: Store/overwrite event for each cluster
+else Matching handlers exist
+  loop for handler in matchingHandlers
+    alt persist == true or (persist == undefined and persistDefault == true)
+      EVENTUALITY -> STORE : persistEvent(event, clusters)
+    else eventType == 'REQUEST_EVENT'
+      EVENTUALITY -> STORE : persistEvent(event, clusters)
+      EVENTUALITY -> EVENTUALITY : extract targetEvent, cluster, handler
+      EVENTUALITY -> EVENTUALITY : subscribe(targetEvent, handler, cluster)
+    else persist == false and eventType != 'REQUEST_EVENT'
+      EVENTUALITY -> STORE : removePersistedEvent(event, clusters)
+    end
+    EVENTUALITY -> HANDLER : handler.callback(event)
+  end
+end
+
+note right of EVENTUALITY #EAEAEA
+  - REQUEST_EVENT: siempre persistente y auto-suscribe
+  - No persistente: elimina eventos previos
+end note
+
+legend right
+  |= Color |= Element |
+  |<#2E86C1>| Actor: Publisher |
+  |<#F9E79F>| Component: Eventuality, Registry, Handler |
+  |<#AED6F1>| Data Store: Persisted Events Store |
+  |<#FDEBD0>| System Boundary |
+  |<#EAEAEA>| Note |
+end legend
+@enduml

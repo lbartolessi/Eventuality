@@ -1,0 +1,41 @@
+@startuml gg
+' Based on documentation/Eventuality-RemovePersistedEventSequence.md
+title Eventuality – Sequence Diagram: Remove Persisted Event
+
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+skinparam defaultFontName Roboto
+skinparam actor {
+  FontName Roboto
+  FontSize 12
+  BorderColor #5D6D7E
+  FontColor #34495E
+}
+skinparam participant {
+  FontName Roboto
+  FontSize 12
+  BorderColor #5D6D7E
+  FontColor #34495E
+}
+skinparam sequence {
+  ArrowFontName Roboto
+  ArrowFontSize 11
+  ArrowColor #5D6D7E
+  LifeLineBorderColor #5D6D7E
+}
+
+actor Publisher #B3D1FF
+participant "Eventuality (Bus)" #D1FFD1
+participant "Persisted Events Store" #F5F5F5
+
+Publisher -> "Eventuality (Bus)" : publish(event, clusters, persist=false)
+"Eventuality (Bus)" -> "Persisted Events Store" : remove persisted event(s)
+
+legend right
+  |= Color |= Element |
+  |<#B3D1FF>| Blue: Publisher |
+  |<#D1FFD1>| Green: Eventuality (Bus) |
+  |<#F5F5F5>| Light Gray: Store |
+end legend
+
+@enduml

@@ -1,0 +1,51 @@
+@startuml
+' Based on documentation/Eventuality-CoreEntity_RelationshipDiagram.md
+title Eventuality – Core Entity-Relationship Diagram
+
+skinparam defaultFontName Roboto
+skinparam entity {
+  FontName Roboto
+  FontSize 12
+  BorderColor #5D6D7E
+  FontColor #34495E
+}
+skinparam relationship {
+  FontName Roboto
+  FontSize 11
+  FontColor #888888
+  LineColor #888888
+}
+
+entity Subscriber #B3D1FF
+entity Publisher #B3D1FF
+entity Eventuality #D1FFD1 {
+  (core bus)
+}
+entity Event #CCCCCC {
+  (eventType, data, clusters)
+}
+entity Handler #FFD580 {
+  (eventType, cluster, callback)
+}
+entity Cluster #B3D1FF {
+  (name)
+}
+
+Subscriber -- Handler : registers\n1..*
+Publisher -- Event : publishes\n1..*
+Eventuality -- Handler : manages\n*
+Eventuality -- Event : stores\n*
+Handler .. Event : handles\n1..1
+Handler -- Cluster : for\n1
+Event .. Cluster : belongs to\n1
+
+legend right
+  |= Color |= Element |
+  |<#B3D1FF>| Blue: Publisher / Subscriber / Cluster |
+  |<#D1FFD1>| Green: Eventuality (Bus) |
+  |<#FFD580>| Orange: Handler |
+  |<#CCCCCC>| Gray: Event |
+  |<#FFFFFF>| Dashed: Logical/indirect relation |
+end legend
+
+@enduml

@@ -1,0 +1,18 @@
+---
+title: Eventuality Persistence Data Flow
+---
+flowchart TD
+    A["Event published with persist=true"] --> B["Eventuality stores event in Persisted Events Store"]
+    B --> C["Late subscriber calls subscribe(event, handler, cluster)"]
+    C --> D{"Is there a persisted event for this eventType and cluster?"}
+    D -- "Yes" --> E["Deliver persisted event to handler immediately"]
+    D -- "No" --> F["Wait for future events"]
+    E --> G["Handler processes event"]
+    F --> G
+    style A fill:#A9DFBF,stroke:#2E86C1,stroke-width:2px,color:#000
+    style B fill:#AED6F1,stroke:#2E86C1,stroke-width:2px,color:#000
+    style C fill:#A9DFBF,stroke:#2E86C1,stroke-width:2px,color:#000
+    style D fill:#F9E79F,stroke:#2E86C1,stroke-width:2px,color:#000
+    style E fill:#A9DFBF,stroke:#2E86C1,stroke-width:2px,color:#000
+    style F fill:#F9E79F,stroke:#2E86C1,stroke-width:2px,color:#000
+    style G fill:#FDEBD0,stroke:#2E86C1,stroke-width:2px,color:#000

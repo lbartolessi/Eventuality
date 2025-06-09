@@ -1,0 +1,19 @@
+// Eventuality - Sequence Diagram: Subscribe to Event
+digraph SubscribeEventSequence {
+    rankdir=LR
+    node [shape=box, style=filled, fontname=Arial, fontsize=12]
+    edge [fontname=Arial, fontsize=11]
+
+    Subscriber [label="Subscriber", fillcolor="#B3D1FF"]
+    Eventuality [label="Eventuality (Bus)", fillcolor="#D1FFD1"]
+    SubscriptionRegistry [label="Subscription Registry", fillcolor="#F5F5F5"]
+    PersistedEventsStore [label="Persisted Events Store", fillcolor="#F5F5F5"]
+    Handler [label="Handler", fillcolor="#FFD580"]
+    EventualityLogger [label="EventualityLogger", fillcolor="#A3E4D7"]
+
+    Subscriber -> Eventuality [label="subscribe(eventType, handler, cluster)"]
+    Eventuality -> SubscriptionRegistry [label="register handler"]
+    Eventuality -> PersistedEventsStore [label="find persisted events"]
+    PersistedEventsStore -> Handler [label="deliver persisted event(s)"]
+    Eventuality -> EventualityLogger [label="log subscribe"]
+}
