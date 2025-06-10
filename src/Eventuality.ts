@@ -60,8 +60,8 @@ class EventualityLogger {
     state: 'LOST' | 'FOUND' | 'SYNC',
     eventType: string,
     clusters?: Set<string>,
-    className?: string,
-    tagName?: string,
+    className?: string | null,
+    tagName?: string | null,
     data?: unknown
   ) {
     const timestamp = new Date().toISOString();
