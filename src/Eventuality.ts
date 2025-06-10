@@ -614,6 +614,25 @@ export class Eventuality implements EventualityInterface {
   }
 
   /**
+   * Crea un EventHandler a partir de una función y una instancia.
+   * @param fn La función que se ejecutará cuando se dispare el evento.
+   * @param instance La instancia que se usará como contexto para la función.
+   * @returns Un EventHandler con la función y el contexto proporcionados.
+   */
+  static createEventHandler<T>(
+    fn: (payload: T) => void,
+    instance: any
+  ): EventHandler<T> {
+    const handler = ((payload: T) =>
+      fn.call(instance, payload)) as EventHandler<T>;
+    handler.id = Symbol('EventHandlerID');
+    handler.className = instance.constructor.name;
+    handler.tagName =
+      instance instanceof HTMLElement ? instance.localName : null;
+    return handler;
+  }
+
+  /**
    * Resetea la instancia singleton (solo para testing).
    */
   public static _resetInstance(): void {
