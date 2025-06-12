@@ -1,6 +1,6 @@
 {
   "name": "@lbartolessi/eventuality",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "type": "module",
   "description": "Event Bus for TypeScript applications",
   "main": "./dist/index.js",
