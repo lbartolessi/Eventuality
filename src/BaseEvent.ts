@@ -4,5 +4,5 @@
  */
 export interface BaseEvent<T> {
   eventType: string;
-  data?: T;
+  data: T | {};
 }

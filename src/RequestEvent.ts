@@ -17,5 +17,5 @@ export interface RequestEventData<D> {
 
 export interface RequestEvent<D> extends BaseEvent<RequestEventData<D>> {
   eventType: 'REQUEST_EVENT';
-  data?: RequestEventData<D>;
+  data: RequestEventData<D>;
 }
