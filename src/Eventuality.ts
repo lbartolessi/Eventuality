@@ -614,10 +614,10 @@ export class Eventuality implements EventualityInterface {
   }
 
   /**
-   * Crea un EventHandler a partir de una función y una instancia.
-   * @param fn La función que se ejecutará cuando se dispare el evento.
-   * @param instance La instancia que se usará como contexto para la función.
-   * @returns Un EventHandler con la función y el contexto proporcionados.
+   * Creates an EventHandler from a function and an instance.
+   * @param {Function} fn The function to be executed when the event is triggered.
+   * @param {Object} instance The instance to be used as the context for the function.
+   * @returns {EventHandler} An EventHandler with the provided function and context.
    */
   static createEventHandler<T>(
     fn: (payload: T) => void,
@@ -633,7 +633,7 @@ export class Eventuality implements EventualityInterface {
   }
 
   /**
-   * Resetea la instancia singleton (solo para testing).
+   * Resets the singleton instance (only for testing)
    */
   public static _resetInstance(): void {
     Eventuality._instance = null;

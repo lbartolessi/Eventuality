@@ -1,5 +1,6 @@
-# Eventuality 📢🚍️ 
-_Event Bus for Web Components_
+# Eventuality 📢🚍️
+
+## *Event Bus for Web Components*
 
 ![Event bus for everyone](images_for_readme/eventuality-github-copilot.png) ![Badge in Development](https://img.shields.io/badge/STATUS-IN%20DEVELOPMENT-green)
 
@@ -116,6 +117,7 @@ See [`documentation/Glossary.md`](./documentation/Glossary.md) for more.
 ## Testing
 
 Run all tests:
+
 ```bash
 npm test
 ```
@@ -125,6 +127,7 @@ npm test
 ## Linting
 
 Check code style and quality:
+
 ```bash
 npm run lint
 ```

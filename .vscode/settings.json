@@ -1,6 +1,6 @@
 {
     "geminicodeassist.customCommands": {
-        "requeriments-analysis": "Genera la documentacion de requisitos del artefacto que a continuación se menciona: "
+        "requirements-analysis": "Genera la documentacion de requisitos del artefacto que a continuación se menciona: "
     },
     "workbench.colorCustomizations": {
         "activityBar.activeBackground": "#ab307e",
@@ -24,5 +24,8 @@
     "peacock.color": "#832561",
     "geminicodeassist.codeGenerationPaneViewEnabled": true,
     "geminicodeassist.updateChannel": "Default",
-    "geminicodeassist.verboseLogging": true
-}
+    "geminicodeassist.verboseLogging": true,
+    "eslint.options": {
+        "overrideConfigFile": ".eslintrc.cjs"
+      }
+    }

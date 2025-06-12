@@ -6,7 +6,7 @@
 	],
 	"settings": {
 		"geminicodeassist.customCommands": {
-			"requeriments-analysis": "Genera la documentacion de requisitos del artefacto que a continuación se menciona: "
+			"requirements-analysis": "Genera la documentacion de requisitos del artefacto que a continuación se menciona: "
 		},
 		"workbench.colorCustomizations": {
 			"activityBar.activeBackground": "#ab307e",
