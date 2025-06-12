@@ -140,11 +140,11 @@ class EventualityLogger {
     EventualityLogger.logWithBox(
       'REQ',
       'SYNC',
-      request.data.targetEvent.eventType,
+      request.data!.targetEvent.eventType,
       clusters,
-      request.data.handler.className,
-      request.data.handler.tagName,
-      request.data.targetEvent.data
+      request.data!.handler.className,
+      request.data!.handler.tagName,
+      request.data!.targetEvent.data
     );
   }
   public static unsubscribeLog<T extends BaseEvent<D>, D>(
