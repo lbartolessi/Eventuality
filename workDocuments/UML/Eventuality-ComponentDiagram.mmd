@@ -1,0 +1,26 @@
+---
+title: Eventuality Component Diagram
+---
+flowchart LR
+    subgraph EventualitySystem["Eventuality System"]
+        EventualityBus["Eventuality (Event Bus)"]
+        Logger["EventualityLogger"]
+        PersistedStore["Persisted Events Store"]
+        Subscriptions["Subscriptions Map"]
+    end
+    subgraph Application["Application Components"]
+        Publisher["Publisher Component"]
+        Subscriber["Subscriber Component"]
+    end
+    Publisher -- "publish/subscribe/request" --> EventualityBus
+    Subscriber -- "subscribe/unsubscribe" --> EventualityBus
+    EventualityBus -- "logs" --> Logger
+    EventualityBus -- "stores events" --> PersistedStore
+    EventualityBus -- "manages" --> Subscriptions
+    style EventualitySystem fill:#FDEBD0,stroke:#2E86C1,stroke-width:2px,color:#000
+    style Application fill:#A9DFBF,stroke:#2E86C1,stroke-width:2px,color:#000
+    style Logger fill:#D2B4DE,stroke:#2E86C1,stroke-width:2px,color:#000
+    style PersistedStore fill:#AED6F1,stroke:#2E86C1,stroke-width:2px,color:#000
+    style Subscriptions fill:#F9E79F,stroke:#2E86C1,stroke-width:2px,color:#000
+    style Publisher fill:#A9DFBF,stroke:#2E86C1,stroke-width:2px,color:#000
+    style Subscriber fill:#A9DFBF,stroke:#2E86C1,stroke-width:2px,color:#000

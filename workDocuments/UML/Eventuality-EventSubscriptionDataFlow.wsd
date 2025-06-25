@@ -1,0 +1,80 @@
+@startuml Eventuality-EventSubscriptionDataFlow
+' Title and legend
+!define RECTANGLE class
+!define ACTOR actor
+!define DATABASE database
+!define NOTE note
+
+' Color definitions (from diagrams.md)
+!define COLOR_ACTOR #2E86C1
+!define COLOR_ACTIVITY #A9DFBF
+!define COLOR_COMPONENT #F9E79F
+!define COLOR_INTERFACE #D2B4DE
+!define COLOR_DATABASE #AED6F1
+!define COLOR_SYSTEM_BOUNDARY #FDEBD0
+!define COLOR_NOTE #EAEAEA
+
+skinparam backgroundColor COLOR_SYSTEM_BOUNDARY
+skinparam defaultFontName "Roboto"
+skinparam rectangle {
+  BackgroundColor COLOR_COMPONENT
+  BorderColor Black
+}
+skinparam actor {
+  BackgroundColor COLOR_ACTOR
+  BorderColor Black
+}
+skinparam database {
+  BackgroundColor COLOR_DATABASE
+  BorderColor Black
+}
+skinparam note {
+  BackgroundColor COLOR_NOTE
+  BorderColor Black
+}
+
+' System boundary
+rectangle "Eventuality System" as SystemBoundary #FDEBD0 {
+  actor Subscriber as SUB #2E86C1
+  rectangle "Eventuality" as EVENTUALITY #F9E79F
+  database "Persisted Events Store" as STORE #AED6F1
+}
+
+' Flow
+SUB --> EVENTUALITY : subscribe(eventType, handler, cluster)
+EVENTUALITY --> EVENTUALITY : Check for existing handler
+EVENTUALITY --> EVENTUALITY : Register or update handler
+EVENTUALITY --> STORE : Search for matching persisted events
+STORE --> EVENTUALITY : Return matching events
+EVENTUALITY --> SUB : Deliver persisted events (if any)
+
+note right of EVENTUALITY #EAEAEA
+  If handler already exists:
+    - Update cluster
+  Else:
+    - Register new handler
+end note
+
+note right of STORE #EAEAEA
+  Match if:
+    event.eventType == eventType
+    AND (event.cluster == cluster
+         OR cluster == '*'
+         OR event.cluster == '*')
+end note
+
+note bottom of SUB #EAEAEA
+  Handler will also receive future events
+end note
+
+' Legend
+note as LEGEND
+  == Legend ==
+  Actor: #2E86C1 (Blue)
+  Activity/Process: #A9DFBF (Light Green)
+  Component: #F9E79F (Light Yellow)
+  Data Store: #AED6F1 (Light Blue)
+  System Boundary: #FDEBD0 (Beige)
+  Note: #EAEAEA (Light Gray)
+end note
+@enduml

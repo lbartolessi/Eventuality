@@ -1,0 +1,108 @@
+// Eventuality - Unified Subscription Flow (Normal & Duplicate Handler)
+digraph unified_subscription_flow {
+    label="Eventuality - Unified Subscription Flow"
+    labelloc=top
+    fontsize=20
+    rankdir=TB
+    node [style=filled, fontname=Arial, shape=box]
+
+    Subscriber [label="Subscriber", fillcolor="#B3D1FF"]
+    Eventuality [label="Eventuality\n(handler registry)", fillcolor="#D1FFD1", shape=ellipse]
+    StartSubscription [label="subscribe(eventType, handler, cluster)", fillcolor="#D1FFD1"]
+
+    // Check for existing handler for this eventType and handler
+    CheckDuplicate [label="Is there already a handler\nwith same eventType and handler?", shape=diamond, fillcolor="#FFF2CC"]
+
+    // If YES, update cluster
+    UpdateCluster [label=<
+      <B>Update Cluster</B><br/>
+      <FONT POINT-SIZE="10">Replace the previous cluster for this handler and eventType<br/>with the new cluster value.</FONT>
+    >, shape=box, fillcolor="#CCCCCC"]
+
+    // If NO, register new handler
+    RegisterHandler [label=<
+      <B>Register Handler</B><br/>
+      <FONT POINT-SIZE="10">Add handler to registry for this eventType and cluster.</FONT>
+    >, shape=box, fillcolor="#CCCCCC"]
+
+    // Check for persisted events
+    CheckPersisted [label="Are there persisted events\nfor this eventType and cluster?", shape=diamond, fillcolor="#FFF2CC"]
+    DeliverPersisted [label="Deliver persisted event(s)\nto handler (async)", fillcolor="#FFD580"]
+    Exit [label="<<exit>>", shape=oval, fillcolor="#FFFFFF", style="bold"]
+
+    // Main flow
+    Subscriber -> Eventuality [label="subscribe(...)"]
+    Eventuality -> StartSubscription
+    StartSubscription -> CheckDuplicate
+
+    // If handler exists, update cluster
+    CheckDuplicate -> UpdateCluster [label="Yes"]
+    UpdateCluster -> CheckPersisted
+
+    // If handler does not exist, register new
+    CheckDuplicate -> RegisterHandler [label="No"]
+    RegisterHandler -> CheckPersisted
+
+    // Persisted event logic
+    CheckPersisted -> DeliverPersisted [label="Yes"]
+    DeliverPersisted -> Exit
+    CheckPersisted -> Exit [label="No"]
+
+    // Compact vertical legend aligned to the top right
+    spacer [label="", shape=box, width=0.01, height=0.01, style=invis]
+    legend [shape=none, margin=0, label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="2">
+            <TR><TD BGCOLOR="#B3D1FF">Blue: Subscriber</TD></TR>
+            <TR><TD BGCOLOR="#D1FFD1">Green: Logic</TD></TR>
+            <TR><TD BGCOLOR="#FFD580">Orange: Handler</TD></TR>
+            <TR><TD BGCOLOR="#CCCCCC">Gray: Registry/Update</TD></TR>
+            <TR><TD BGCOLOR="#FFF2CC">Yellow: Decision</TD></TR>
+        </TABLE>
+    >]
+
+    // Place legend at the top right, separated by spacer
+    {rank=min; spacer -> legend [style=invis];}
+}// Reference: 3.1.8, 3.3.3, 1.3 (Definitions)
+digraph detailed_subscription_flow {
+    label="Eventuality - Event Subscription Data Flow"
+    labelloc=top
+    fontsize=20
+    rankdir=TB
+    node [style=filled, fontname=Arial, shape=box]
+
+    Subscriber [label="Subscriber", fillcolor="#B3D1FF"]
+    Eventuality [label="Eventuality\n(handler registry)", fillcolor="#D1FFD1", shape=ellipse]
+    HandlerRegistration [label="Register handler:\n(eventType, cluster, callback)", fillcolor="#FFD580"]
+    PersistedEventsCheck [label="Are there persisted events\nfor this eventType and cluster?", shape=diamond, fillcolor="#FFF2CC"]
+    PersistedEvents [label="Persisted Events", fillcolor="#CCCCCC"]
+    DeliverPersisted [label="Deliver persisted event(s)\nto handler", fillcolor="#FFD580"]
+    Exit [label="<<exit>>", shape=oval, fillcolor="#FFFFFF", style="bold"]
+
+    // Main flow
+    Subscriber -> Eventuality [label="subscribe(eventType, handler, cluster) [3.3.3]"]
+    Eventuality -> HandlerRegistration [label="Register handler"]
+    HandlerRegistration -> PersistedEventsCheck
+
+    // If there are persisted events, deliver them
+    PersistedEventsCheck -> PersistedEvents [label="Yes"]
+    PersistedEvents -> DeliverPersisted [label="Get matching events"]
+    DeliverPersisted -> Exit
+
+    // If not, finish
+    PersistedEventsCheck -> Exit [label="No"]
+
+    // Compact vertical legend aligned to the top right
+    spacer [label="", shape=box, width=0.01, height=0.01, style=invis]
+    legend [shape=none, margin=0, label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="2">
+            <TR><TD BGCOLOR="#B3D1FF">Blue: Subscriber</TD></TR>
+            <TR><TD BGCOLOR="#D1FFD1">Green: Logic</TD></TR>
+            <TR><TD BGCOLOR="#FFD580">Orange: Handler</TD></TR>
+            <TR><TD BGCOLOR="#CCCCCC">Gray: Persistence</TD></TR>
+            <TR><TD BGCOLOR="#FFF2CC">Yellow: Decision</TD></TR>
+        </TABLE>
+    >]
+
+    // Place legend at the top right, separated by spacer
+    {rank=min; spacer -> legend [style=invis];}
+}

@@ -1,0 +1,53 @@
+@startuml c
+' Based on documentation/Eventuality-PublishEventSequence.md
+title Eventuality – Sequence Diagram: Publish Event
+
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+skinparam defaultFontName Roboto
+skinparam actor {
+  FontName Roboto
+  FontSize 12
+  BorderColor #5D6D7E
+  FontColor #34495E
+}
+skinparam participant {
+  FontName Roboto
+  FontSize 12
+  BorderColor #5D6D7E
+  FontColor #34495E
+}
+skinparam sequence {
+  ArrowFontName Roboto
+  ArrowFontSize 11
+  ArrowColor #5D6D7E
+  LifeLineBorderColor #5D6D7E
+}
+
+actor Publisher #B3D1FF
+participant "Eventuality (Bus)" #D1FFD1
+participant "Subscription Registry" #F5F5F5
+participant "EventualityLogger" #A3E4D7
+participant "Event Queue" #F5F5F5
+participant "Handler(s)" #FFD580
+participant "Persisted Events Store" #F5F5F5
+
+Publisher -> "Eventuality (Bus)" : publish(event, clusters, persist)
+"Eventuality (Bus)" -> "Subscription Registry" : find handlers
+"Eventuality (Bus)" -> "EventualityLogger" : log publish
+"Eventuality (Bus)" -> "Event Queue" : enqueue event
+"Event Queue" -> "Handler(s)" : dispatch to handler(s)
+"Handler(s)" -> "EventualityLogger" : log handler
+"Eventuality (Bus)" -> "Persisted Events Store" : persist event if no handlers
+"Eventuality (Bus)" -> "Persisted Events Store" : remove persisted if needed
+
+legend right
+  |= Color |= Element |
+  |<#B3D1FF>| Blue: Publisher |
+  |<#D1FFD1>| Green: Eventuality (Bus) |
+  |<#F5F5F5>| Light Gray: Store/Queue |
+  |<#A3E4D7>| Cyan: Logger |
+  |<#FFD580>| Orange: Handler |
+end legend
+
+@enduml

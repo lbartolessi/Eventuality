@@ -1,0 +1,15 @@
+// Eventuality - Sequence Diagram: Deliver Persisted Event on Subscription
+digraph DeliverPersistedEventSequence {
+    rankdir=LR
+    node [shape=box, style=filled, fontname=Arial, fontsize=12]
+    edge [fontname=Arial, fontsize=11]
+
+    Subscriber [label="Subscriber", fillcolor="#B3D1FF"]
+    Eventuality [label="Eventuality (Bus)", fillcolor="#D1FFD1"]
+    PersistedEventsStore [label="Persisted Events Store", fillcolor="#F5F5F5"]
+    Handler [label="Handler", fillcolor="#FFD580"]
+
+    Subscriber -> Eventuality [label="subscribe(eventType, handler, cluster)"]
+    Eventuality -> PersistedEventsStore [label="find persisted events"]
+    PersistedEventsStore -> Handler [label="deliver persisted event(s)"]
+}

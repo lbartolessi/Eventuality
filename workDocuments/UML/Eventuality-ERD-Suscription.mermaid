@@ -1,0 +1,63 @@
+erDiagram
+    %%{
+      init: {
+        "fontFamily": "Roboto",
+        "themeVariables": {
+          "lineColor": "#5D6D7E",
+          "primaryTextColor": "#34495E",
+          "fontSize": "14px"
+        }
+      }
+    }%%
+
+    classDef entityStyle fill:#F9E79F,stroke:#5D6D7E,color:#34495E,stroke-width:2
+
+    EventType ||--o{ EventInstance : "is instance of"
+    Subscription ||--o{ EventType : "targets"
+    EventType }o--|| Handler : "is basis for"
+
+    SubscriberClass ||--o{ Handler : "defines"
+
+    Cluster ||--o{ Subscription : "hosts"
+
+    Handler ||--o| Subscription : "fulfills"
+
+    EventType {
+        string eventTypeName PK "Event Type Name"
+    }
+    class EventType entityStyle
+
+    EventInstance {
+        string eventId PK "Unique Event ID"
+        datetime timestamp "Timestamp of occurrence"
+        string source "Origin of the event"
+        json data "Event payload"
+        string correlationId "Correlation ID (optional)"
+        string eventTypeName FK "References EventType"
+    }
+    class EventInstance entityStyle
+
+    Cluster {
+        string clusterName PK "Cluster Name"
+    }
+    class Cluster entityStyle
+
+    SubscriberClass {
+        string className PK "Class Name"
+    }
+    class SubscriberClass entityStyle
+
+    Handler {
+        string handlerId PK "Unique Handler ID (Symbol)"
+        string methodName "Method/Function Name"
+        string className FK "References SubscriberClass"
+        string eventTypeName FK "References EventType"
+    }
+    class Handler entityStyle
+
+    Subscription {
+        string handlerId PK, FK "References Handler"
+        string eventTypeName FK "References EventType"
+        string clusterName FK "References Cluster"
+    }
+    class Subscription entityStyle

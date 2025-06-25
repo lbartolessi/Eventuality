@@ -1,0 +1,53 @@
+// Eventuality - Use Case Overview Diagram
+digraph eventuality_use_cases {
+    label="Eventuality – Use Case Overview"
+    labelloc=top
+    fontsize=20
+    rankdir=TB
+    node [fontname=Arial, fontsize=12, style=filled, shape=box]
+
+    // Actors
+    System [label="System / Developer", fillcolor="#B3D1FF"]
+    Subscriber [label="Subscriber", fillcolor="#B3D1FF"]
+    Publisher [label="Publisher", fillcolor="#B3D1FF"]
+
+    // Use Cases
+    Init [label="UC-001: Initialize Eventuality", fillcolor="#D1FFD1"]
+    RegisterHandler [label="UC-002: Register a Handler", fillcolor="#D1FFD1"]
+    UnregisterHandler [label="UC-003: Unregister a Handler", fillcolor="#D1FFD1"]
+    PublishEvent [label="UC-004: Publish an Event", fillcolor="#D1FFD1"]
+    SubscribeEvent [label="UC-005: Subscribe to an Event Type", fillcolor="#D1FFD1"]
+    DeliverPersisted [label="UC-006: Deliver Persisted Events on Subscription", fillcolor="#D1FFD1"]
+    RequestEvent [label="UC-007: Request an Event\n(Request-Response Pattern)", fillcolor="#D1FFD1"]
+    RemovePersisted [label="UC-008: Remove Persisted Events", fillcolor="#D1FFD1"]
+    DuplicateSub [label="UC-009: Handle Duplicate Subscription", fillcolor="#D1FFD1"]
+
+    // Relations
+    System -> Init
+    Subscriber -> RegisterHandler
+    Subscriber -> UnregisterHandler
+    Publisher -> PublishEvent
+    Subscriber -> SubscribeEvent
+    Subscriber -> DeliverPersisted
+    Publisher -> RequestEvent
+    Publisher -> RemovePersisted
+    Subscriber -> DuplicateSub
+
+    // Logical flows between use cases (dashed)
+    RegisterHandler -> DeliverPersisted [style=dashed, label="triggers"]
+    SubscribeEvent -> DeliverPersisted [style=dashed, label="may trigger"]
+    PublishEvent -> RemovePersisted [style=dashed, label="may trigger"]
+    PublishEvent -> RequestEvent [style=dashed, label="specializes"]
+    RegisterHandler -> DuplicateSub [style=dashed, label="if duplicate"]
+
+    // Legend
+    spacer [label="", shape=box, width=0.01, height=0.01, style=invis]
+    legend [shape=none, margin=0, label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="2">
+            <TR><TD BGCOLOR="#B3D1FF">Blue: Actor</TD></TR>
+            <TR><TD BGCOLOR="#D1FFD1">Green: Use Case</TD></TR>
+            <TR><TD>Dashed: Use case relationship</TD></TR>
+        </TABLE>
+    >]
+    {rank=min; spacer -> legend [style=invis];}
+}

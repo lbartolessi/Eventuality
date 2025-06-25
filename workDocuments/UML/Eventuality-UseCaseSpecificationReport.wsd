@@ -1,0 +1,61 @@
+@startuml
+' Based on documentation/Eventuality_UseCaseSpecificationReport.md
+title Eventuality – Use Case Overview
+
+skinparam defaultFontName Roboto
+skinparam actor {
+  FontName Roboto
+  FontSize 12
+  BorderColor #5D6D7E
+  FontColor #34495E
+}
+skinparam usecase {
+  FontName Roboto
+  FontSize 12
+  BorderColor #5D6D7E
+  FontColor #34495E
+}
+skinparam arrow {
+  FontName Roboto
+  FontSize 11
+  Color #5D6D7E
+}
+
+actor "System / Developer" as System #B3D1FF
+actor Subscriber #B3D1FF
+actor Publisher #B3D1FF
+
+usecase "UC-001: Initialize Eventuality" as Init #D1FFD1
+usecase "UC-002: Register a Handler" as RegisterHandler #D1FFD1
+usecase "UC-003: Unregister a Handler" as UnregisterHandler #D1FFD1
+usecase "UC-004: Publish an Event" as PublishEvent #D1FFD1
+usecase "UC-005: Subscribe to an Event Type" as SubscribeEvent #D1FFD1
+usecase "UC-006: Deliver Persisted Events on Subscription" as DeliverPersisted #D1FFD1
+usecase "UC-007: Request an Event\n(Request-Response Pattern)" as RequestEvent #D1FFD1
+usecase "UC-008: Remove Persisted Events" as RemovePersisted #D1FFD1
+usecase "UC-009: Handle Duplicate Subscription" as DuplicateSub #D1FFD1
+
+System --> Init
+Subscriber --> RegisterHandler
+Subscriber --> UnregisterHandler
+Publisher --> PublishEvent
+Subscriber --> SubscribeEvent
+Subscriber --> DeliverPersisted
+Publisher --> RequestEvent
+Publisher --> RemovePersisted
+Subscriber --> DuplicateSub
+
+RegisterHandler ..> DeliverPersisted : triggers
+SubscribeEvent ..> DeliverPersisted : may trigger
+PublishEvent ..> RemovePersisted : may trigger
+PublishEvent ..> RequestEvent : specializes
+RegisterHandler ..> DuplicateSub : if duplicate
+
+legend right
+  |= Color |= Element |
+  |<#B3D1FF>| Blue: Actor |
+  |<#D1FFD1>| Green: Use Case |
+  |<#FFFFFF>| Dashed: Use case relationship |
+end legend
+
+@enduml

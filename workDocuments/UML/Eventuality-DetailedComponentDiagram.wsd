@@ -1,0 +1,105 @@
+@startuml Eventuality_DetailedComponentDiagram
+' Eventuality – Detailed Component Diagram
+' Colores y estilo según diagrams.md
+
+title Eventuality – Detailed Component Diagram
+
+' Leyenda de colores
+' Verde: Bus principal/componentes core
+' Púrpura: Interfaces/contratos
+' Gris: Evento
+' Naranja: Handler
+' Azul: Cluster, Publisher, Subscriber
+' Amarillo: Opciones/config
+' Cian: Logger
+' Rojo: Error
+' Violeta: Decorador
+' Gris claro: Almacén interno/auxiliar
+
+skinparam component {
+  BackgroundColor<<core>> #D1FFD1
+  BackgroundColor<<interface>> #D2B4DE
+  BackgroundColor<<logger>> #A3E4D7
+  BackgroundColor<<error>> #F5B7B1
+  BackgroundColor<<options>> #FAD7A0
+  BackgroundColor<<store>> #F5F5F5
+  BackgroundColor<<event>> #CCCCCC
+  BackgroundColor<<handler>> #FFD580
+  BackgroundColor<<cluster>> #B3D1FF
+  BackgroundColor<<decorator>> #E8DAEF
+}
+
+' Componentes principales
+component Eventuality <<core>> as "Eventuality (core bus)"
+interface EventualityInterface <<interface>> as "EventualityInterface"
+component EventualityLogger <<logger>> as "EventualityLogger"
+component EventualityError <<error>> as "EventualityError"
+component EventualityOptions <<options>> as "EventualityOptions"
+component EventQueue <<store>> as "EventQueue"
+component SubscriptionRegistry <<store>> as "SubscriptionRegistry"
+component PersistedEventsStore <<store>> as "PersistedEventsStore"
+component Decorators <<decorator>> as "Decorators"
+
+' Entidades de dominio
+component Event <<event>> as "Event"
+component Handler <<handler>> as "Handler"
+component Cluster <<cluster>> as "Cluster"
+component RequestDetails <<store>> as "RequestDetails"
+component EventHandler <<store>> as "EventHandler"
+interface RequestEvent <<interface>> as "RequestEvent"
+interface RequestEventData <<interface>> as "RequestEventData"
+
+' Actores externos
+actor Publisher <<cluster>>
+actor Subscriber <<cluster>>
+
+' Relaciones externas
+Publisher --> EventualityInterface : publica
+Subscriber --> EventualityInterface : suscribe
+EventualityInterface ..> Eventuality : implementado por
+
+' Relaciones core bus
+Eventuality --> EventualityLogger : logs
+Eventuality --> EventualityError : errores
+Eventuality --> EventualityOptions : lee config
+Eventuality --> EventQueue : encola eventos
+Eventuality --> SubscriptionRegistry : gestiona handlers
+Eventuality --> PersistedEventsStore : persiste eventos
+Eventuality --> Decorators : usa decoradores
+Eventuality --> RequestDetails : request/response
+Eventuality --> EventHandler : invoca
+
+' Flujos de datos y dominio
+Eventuality --> Event : crea/lee
+Eventuality --> Handler : crea/lee
+Handler --> Cluster : para
+Handler ..|> EventHandler : es un
+Event --> Cluster : pertenece a
+RequestDetails --> Event : target
+RequestDetails --> EventHandler : handler
+RequestEvent --> RequestEventData : data
+RequestEventData --> Event : targetEvent
+RequestEventData --> EventHandler : handler
+
+' Decoradores
+Decorators --> EventHandler : crea
+
+' Almacenes internos
+EventQueue --> Event : almacena
+SubscriptionRegistry --> Handler : almacena
+PersistedEventsStore --> Event : almacena
+
+legend right
+  |= Color |= Elemento |
+  |<#D1FFD1>| Verde: Bus principal/componentes core |
+  |<#D2B4DE>| Púrpura: Interfaces/contratos |
+  |<#CCCCCC>| Gris: Evento |
+  |<#FFD580>| Naranja: Handler |
+  |<#B3D1FF>| Azul: Cluster, Publisher, Subscriber |
+  |<#FAD7A0>| Amarillo: Opciones/config |
+  |<#A3E4D7>| Cian: Logger |
+  |<#F5B7B1>| Rojo: Error |
+  |<#E8DAEF>| Violeta: Decorador |
+  |<#F5F5F5>| Gris claro: Almacén interno/auxiliar |
+end legend
+@enduml

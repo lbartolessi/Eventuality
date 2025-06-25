@@ -1,0 +1,16 @@
+---
+title: Eventuality Event Publishing Sequence Diagram
+---
+sequenceDiagram
+    participant Publisher as "Publisher (Component)"
+    participant Eventuality as "Eventuality (Event Bus)"
+    participant Handler as "Handler (Subscriber)"
+    participant PersistedStore as "Persisted Events Store"
+    Publisher->>Eventuality: publish(event, clusters, persist)
+    alt Event is persisted
+        Eventuality->>PersistedStore: Store event for clusters
+    end
+    Eventuality->>Handler: Deliver event to all matching handlers
+    Note right of Handler: Handler processes event
+    Eventuality-->>Publisher: (optional) Log publish if debugMode
+    %% Text color is not natively supported in sequenceDiagram, but all labels are now clear.

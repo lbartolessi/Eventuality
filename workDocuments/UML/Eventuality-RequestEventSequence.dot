@@ -1,0 +1,19 @@
+// Eventuality - Sequence Diagram: Request-Response Pattern
+digraph RequestEventSequence {
+    rankdir=LR
+    node [shape=box, style=filled, fontname=Arial, fontsize=12]
+    edge [fontname=Arial, fontsize=11]
+
+    Publisher [label="Publisher", fillcolor="#B3D1FF"]
+    Eventuality [label="Eventuality (Bus)", fillcolor="#D1FFD1"]
+    SubscriptionRegistry [label="Subscription Registry", fillcolor="#F5F5F5"]
+    Handler [label="Handler", fillcolor="#FFD580"]
+    PersistedEventsStore [label="Persisted Events Store", fillcolor="#F5F5F5"]
+
+    Publisher -> Eventuality [label="request(requestDetails, clusters)"]
+    Eventuality -> SubscriptionRegistry [label="auto-subscribe handler to target event"]
+    Eventuality -> PersistedEventsStore [label="persist REQUEST_EVENT"]
+    Eventuality -> Handler [label="dispatch REQUEST_EVENT"]
+    Handler -> Eventuality [label="publish response event"]
+    Eventuality -> Handler [label="deliver response to original handler"]
+}
